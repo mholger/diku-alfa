@@ -19,6 +19,7 @@
 #include <sys/time.h>
 #include <fcntl.h>
 #include <signal.h>
+#include <stdlib.h>
 
 #include "structs.h"
 #include "utils.h"
@@ -964,13 +965,13 @@ void nonblock(int s)
 
 
 #define COMA_SIGN \
-"\n\r\
-DikuMUD is currently inactive due to excessive load on the host machine.\n\r\
-Please try again later.\n\r\n
-\n\r\
-   Sadly,\n\r\
-\n\r\
-    the DikuMUD system operators\n\r\n\r"
+"\n\r"\
+"DikuMUD is currently inactive due to excessive load on the host machine.\n\r"\
+"Please try again later.\n\r\n"\
+"\n\r"\
+"   Sadly,\n\r"\
+"\n\r"\
+"    the DikuMUD system operators\n\r\n\r"
 
 
 /* sleep while the load is too high */
