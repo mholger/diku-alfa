@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "fcntl.h": "c",
+        "cmath": "c",
+        "*.tcc": "c"
+    }
+}

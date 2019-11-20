@@ -558,7 +558,7 @@ void night_watchman(void)
 	long tc;
 	struct tm *t_info;
 
-	extern int shutdown;
+	extern int _shutdown;
 
 	void send_to_all(char *messg);
 
@@ -569,9 +569,9 @@ void night_watchman(void)
 		(t_info->tm_wday < 6))
 		if (t_info->tm_min > 50)
 		{
-			log("Leaving the scene for the serious folks.");
+			dikulog("Leaving the scene for the serious folks.");
 			send_to_all("Closing down. Thank you for flying DikuMUD.\n\r");
-			shutdown = 1;
+			_shutdown = 1;
 		}
 		else if (t_info->tm_min > 40)
 			send_to_all("ATTENTION: DikuMUD will shut down in 10 minutes.\n\r");
@@ -587,7 +587,7 @@ void check_reboot(void)
 	char dummy;
 	FILE *boot;
 
-	extern int shutdown, reboot;
+	extern int _shutdown, reboot;
 
 	tc = time(0);
 	t_info = localtime(&tc);
@@ -597,11 +597,11 @@ void check_reboot(void)
 		{
 			if (t_info->tm_min > 50)
 			{
-				log("Reboot exists.");
+				dikulog("Reboot exists.");
 				fread(&dummy, sizeof(dummy), 1, boot);
 				if (!feof(boot))   /* the file is nonepty */
 				{
-					log("Reboot is nonempty.");
+					dikulog("Reboot is nonempty.");
 
 					/* the script can't handle the signals */
 					sigsetmask(sigmask(SIGUSR1) | sigmask(SIGUSR2) |
@@ -611,7 +611,7 @@ void check_reboot(void)
 
 					if (system("./reboot"))
 					{
-						log("Reboot script terminated abnormally");
+						dikulog("Reboot script terminated abnormally");
 						send_to_all("The reboot was cancelled.\n\r");
 						system("mv ./reboot reboot.FAILED");
 						fclose(boot);
@@ -624,7 +624,7 @@ void check_reboot(void)
 				}
 
 				send_to_all("Automatic reboot. Come back in a little while.\n\r");
-				shutdown = reboot = 1;
+				_shutdown = reboot = 1;
 			}
 			else if (t_info->tm_min > 40)
 				send_to_all("ATTENTION: DikuMUD will reboot in 10 minutes.\n\r");
@@ -728,8 +728,8 @@ char *nogames(void)
 
 	if (fl = fopen("lib/nogames", "r"))
 	{
-		log("/usr/games/nogames exists");
-		fgets(text, fl);
+		dikulog("/usr/games/nogames exists");
+		fgets(text, sizeof(text), fl);
 		return(text);
 		fclose(fl);
 	}
@@ -784,7 +784,7 @@ void gr(int s)
  	};
 	static int wnr = 0;
 
-	extern int slow_death, shutdown;
+	extern int slow_death, _shutdown;
 
 	void send_to_all(char *messg);
 
@@ -817,10 +817,10 @@ void gr(int s)
 				wnr = 0;
 			}
 			else
-				shutdown = 1;
+				_shutdown = 1;
 	}
 	else if (workhours())
-		shutdown = 1;				/* this shouldn't happen */
+		_shutdown = 1;				/* this shouldn't happen */
 	else if (wnr)
 	{
 		send_to_all("Things look brighter now - you can continue playing.\n\r");

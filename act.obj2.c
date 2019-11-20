@@ -29,7 +29,6 @@ extern int drink_aff[][3];
 
 struct obj_data *get_object_in_equip_vis(struct char_data *ch,
                          char *arg, struct obj_data **equipment, int *j);
-char *strdup(char *source);
 
 
 
@@ -50,7 +49,7 @@ void weight_change_object(struct obj_data *obj, int weight)
 		GET_OBJ_WEIGHT(obj) += weight;
 		obj_to_obj(obj, tmp_obj);
 	} else {
-		log("Unknown attempt to subtract weight from an object.");
+		dikulog("Unknown attempt to subtract weight from an object.");
 	}
 }
 
@@ -826,7 +825,7 @@ void wear(struct char_data *ch, struct obj_data *obj_object, int keyword)
 			send_to_char(buffer, ch);
 		} break;
 		default: {
-			log("Unknown type called in wear.");
+			dikulog("Unknown type called in wear.");
 		} break;
 	}
 }

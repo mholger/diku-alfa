@@ -48,14 +48,14 @@ int dice(int number, int size)
 
 
 
-/* Create a duplicate of a string */
-char *strdup(char *source)
-{
-	char *new;
+// /* Create a duplicate of a string */
+// char *strdup(char *source)
+// {
+// 	char *new;
 
-	CREATE(new, char, strlen(source)+1);
-	return(strcpy(new, source));
-}
+// 	CREATE(new, char, strlen(source)+1);
+// 	return(strcpy(new, source));
+// }
 
 
 
@@ -95,7 +95,7 @@ int strn_cmp(char *arg1, char *arg2, int n)
 
 
 /* writes a string to the log */
-void log(char *str)
+void dikulog(char *str)
 {
 	long ct;
 	char *tmstr;

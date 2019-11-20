@@ -48,7 +48,7 @@ int checkpointing(void)
 	
 	if (!tics)
 	{
-		log("CHECKPOINT shutdown: tics not updated");
+		dikulog("CHECKPOINT shutdown: tics not updated");
 		abort();
 	}
 	else
@@ -60,10 +60,10 @@ int checkpointing(void)
 
 int shutdown_request(void)
 {
-	extern int shutdown;
+	extern int _shutdown;
 
-	log("Received USR2 - shutdown request");
-	shutdown = 1;
+	dikulog("Received USR2 - shutdown request");
+	_shutdown = 1;
 }
 
 
@@ -71,9 +71,9 @@ int shutdown_request(void)
 /* kick out players etc */
 int hupsig(void)
 {
-	extern int shutdown;
+	extern int _shutdown;
 
-	log("Received SIGHUP, SIGINT, or SIGTERM. Shutting down");
+	dikulog("Received SIGHUP, SIGINT, or SIGTERM. Shutting down");
 	exit(0);   /* something more elegant should perhaps be substituted */
 }
 
@@ -81,5 +81,5 @@ int hupsig(void)
 
 int logsig(void)
 {
-	log("Signal received. Ignoring.");
+	dikulog("Signal received. Ignoring.");
 }

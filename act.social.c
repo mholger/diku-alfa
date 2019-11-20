@@ -73,7 +73,7 @@ char *fread_action(FILE *fl)
 		fgets(buf, MAX_STRING_LENGTH, fl);
 		if (feof(fl))
 		{
-			log("Fread_action - unexpected EOF.");
+			dikulog("Fread_action - unexpected EOF.");
 			exit(0);
 		}
 

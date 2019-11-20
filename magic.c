@@ -13,6 +13,8 @@
 #include "handler.h"
 #include "limits.h"
 
+#include "fcns.h"
+
 /* Extern structures */
 extern struct room_data *world;
 extern struct obj_data  *object_list;
@@ -24,7 +26,6 @@ void damage(struct char_data *ch, struct char_data *victim,
             int damage, int weapontype);
 bool saves_spell(struct char_data *ch, sh_int spell);
 void weight_change_object(struct obj_data *obj, int weight);
-char *strdup(char *source);
 int dice(int number, int size);
 
 
@@ -1062,8 +1063,6 @@ void spell_word_of_recall(byte level, struct char_data *ch,
   extern int top_of_world;
   int loc_nr,location;
   bool found = FALSE;
-
-  void do_look(struct char_data *ch, char *argument, int cmd);
 
 	assert(victim);
 

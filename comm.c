@@ -53,7 +53,7 @@ struct descriptor_data *descriptor_list, *next_to_process;
 
 int lawful = 0;		/* work like the game regulator */
 int slow_death = 0;  /* Shut her down, Martha, she's sucking mud */
-int shutdown = 0;    /* clean shutdown */
+int _shutdown = 0;    /* clean shutdown */
 int reboot = 0;      /* reboot the game after a shutdown */
 int no_specials = 0; /* Suppress ass. of special routines */
 
@@ -85,7 +85,7 @@ void zone_update(void);
 void affect_update( void ); /* In spells.c */
 void point_update( void );  /* In limits.c */
 void free_char(struct char_data *ch);
-void log(char *str);
+void dikulog(char *str);
 void mobile_activity(void);
 void string_add(struct descriptor_data *d, char *str);
 void perform_violence(void);
@@ -118,7 +118,7 @@ int main(int argc, char **argv)
 		{
 			case 'l':
 				lawful = 1;
-				log("Lawful mode selected.");
+				dikulog("Lawful mode selected.");
 			break;
 			case 'd':
 				if (*(argv[pos] + 2))
@@ -127,18 +127,18 @@ int main(int argc, char **argv)
 					dir = argv[pos];
 				else
 				{
-					log("Directory arg expected after option -d.");
+					dikulog("Directory arg expected after option -d.");
 					exit(0);
 				}
 			break;
 			case 's':
 				no_specials = 1;
-				log("Suppressing assignment of special routines.");
+				dikulog("Suppressing assignment of special routines.");
 			break;
 			default:
 				sprintf(buf, "Unknown option -% in argument string.",
 					*(argv[pos] + 1));
-				log(buf);
+				dikulog(buf);
 			break;
 		}
 		pos++;
@@ -158,7 +158,7 @@ int main(int argc, char **argv)
 		}
 
 	sprintf(buf, "Running game on port %d.", port);
-	log(buf);
+	dikulog(buf);
 
 	if (chdir(dir) < 0)
 	{
@@ -167,7 +167,7 @@ int main(int argc, char **argv)
 	}
 
 	sprintf(buf, "Using %s as data directory.", dir);
-	log(buf);
+	dikulog(buf);
 
 	srandom(time(0));
 	run_the_game(port);
@@ -189,27 +189,27 @@ int run_the_game(int port)
 
 	void signal_setup(void);
 	int load(void);
-	void coma(void);
+	void coma(int s);
 
 	PROFILE(monstartup((int) 2, etext);)
 
 	descriptor_list = NULL;
 
-	log("Signal trapping.");
+	dikulog("Signal trapping.");
 	signal_setup();
 
-	log("Opening mother connection.");
+	dikulog("Opening mother connection.");
 	s = init_socket(port);
 
 	if (lawful && load() >= 6)
 	{
-		log("System load too high at startup.");
-		coma();
+		dikulog("System load too high at startup.");
+		coma(s);
 	}
 
 	boot_db();
 
-	log("Entering game loop.");
+	dikulog("Entering game loop.");
 
 	game_loop(s);
 
@@ -219,11 +219,11 @@ int run_the_game(int port)
 
 	if (reboot)
 	{
-		log("Rebooting.");
+		dikulog("Rebooting.");
 		exit(52);            /* what's so great about HHGTTG, anyhow? */
 	}
 
-	log("Normal termination of game.");
+	dikulog("Normal termination of game.");
 }
 
 
@@ -258,7 +258,7 @@ int game_loop(int s)
 		sigmask(SIGVTALRM);
 
 	/* Main loop */
-	while (!shutdown)
+	while (!_shutdown)
 	{
 		/* Check what's happening out there */
 		FD_ZERO(&input_set);
@@ -576,7 +576,7 @@ int init_socket(int port)
 		perror("setsockopt LINGER");
 		exit(1);
 	}
-	if (bind(s, &sa, sizeof(sa), 0) < 0)
+	if (bind(s, &sa, sizeof(sa)) < 0)
 	{
 		perror("bind");
 		close(s);
@@ -792,7 +792,7 @@ int process_input(struct descriptor_data *t)
 					break;
 			else
 			{
-				log("EOF encountered on socket read.");
+				dikulog("EOF encountered on socket read.");
 				return(-1);
 			}
 	}
@@ -877,7 +877,7 @@ int process_input(struct descriptor_data *t)
 
 void close_sockets(int s)
 {
-	log("Closing all sockets.");
+	dikulog("Closing all sockets.");
 
 	while (descriptor_list)
 		close_socket(descriptor_list);
@@ -916,18 +916,18 @@ void close_socket(struct descriptor_data *d)
 			save_char(d->character, NOWHERE);
 			act("$n has lost $s link.", TRUE, d->character, 0, 0, TO_ROOM);
 			sprintf(buf, "Closing link to: %s.", GET_NAME(d->character));
-			log(buf);
+			dikulog(buf);
 			d->character->desc = 0;
 		}
 		else
 		{
 			sprintf(buf, "Losing player: %s.", GET_NAME(d->character));
-			log(buf);
+			dikulog(buf);
 
 			free_char(d->character);
 		}
 	else
-		log("Losing descriptor without char.");
+		dikulog("Losing descriptor without char.");
 		
 
 	if (next_to_process == d)		/* to avoid crashing the process loop */
@@ -954,7 +954,7 @@ void close_socket(struct descriptor_data *d)
 
 void nonblock(int s)
 {
-	if (fcntl(s, F_SETFL, FNDELAY) == -1)
+	if (fcntl(s, F_SETFL, O_NDELAY) == -1)
 	{
 		perror("Noblock");
 		exit(1);
@@ -988,7 +988,7 @@ void coma(int s)
 	int workhours(void);
 	int load(void);
 
-	log("Entering comatose state.");
+	dikulog("Entering comatose state.");
 
 	sigsetmask(sigmask(SIGUSR1) | sigmask(SIGUSR2) | sigmask(SIGINT) |
 		sigmask(SIGPIPE) | sigmask(SIGALRM) | sigmask(SIGTERM) |
@@ -1011,7 +1011,7 @@ void coma(int s)
 		{
 			if (load() < 6)
 			{
-				log("Leaving coma with visitor.");
+				dikulog("Leaving coma with visitor.");
 				sigsetmask(0);
 				return;
 			}
@@ -1026,13 +1026,13 @@ void coma(int s)
 		tics = 1;
 		if (workhours())
 		{
-			log("Working hours collision during coma. Exit.");
+			dikulog("Working hours collision during coma. Exit.");
 			exit(0);
 		}
 	}
 	while (load() >= 6);
 
-	log("Leaving coma.");
+	dikulog("Leaving coma.");
 	sigsetmask(0);
 }
 
@@ -1176,8 +1176,8 @@ void act(char *str, int hide_invisible, struct char_data *ch,
 						case 'F': i = fname((char *) vict_obj); break;
 						case '$': i = "$"; break;
 						default:
-							log("Illegal $-code to act():");
-							log(str);
+							dikulog("Illegal $-code to act():");
+							dikulog(str);
 							break;
 					}
 					while (*point = *(i++))
